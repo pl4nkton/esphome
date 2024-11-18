@@ -927,6 +927,21 @@ class Nextion : public NextionBase, public PollingComponent, public uart::UARTDe
   void set_exit_reparse_on_start(bool exit_reparse);
 
   /**
+   * Sets whether the Nextion display should skip the connection handshake process.
+   * @param skip_handshake True or false. When skip_connection_handshake is true,
+   * the connection will be established without performing the handshake.
+   * This can be useful when using Nextion Simulator.
+   *
+   * Example:
+   * ```cpp
+   * it.set_skip_connection_handshake(true);
+   * ```
+   *
+   * When set to true, the display will be marked as connected without performing a handshake.
+   */
+  void set_skip_connection_handshake(bool skip_handshake) { this->skip_connection_handshake_ = skip_handshake; }
+
+  /**
    * Sets Nextion mode between sleep and awake
    * @param True or false. Sleep=true to enter sleep mode or sleep=false to exit sleep mode.
    */
@@ -951,6 +966,73 @@ class Nextion : public NextionBase, public PollingComponent, public uart::UARTDe
    * may not be correctly set.
    */
   bool set_protocol_reparse_mode(bool active_mode);
+
+  // ======== Nextion Intelligent Series ========
+
+  /**
+   * Set the video id of a component.
+   * @param component The component name.
+   * @param vid_id The video ID.
+   *
+   * Example:
+   * ```cpp
+   * it.set_component_vid("textview", 1);
+   * ```
+   *
+   * This will change the video id of the component `textview`.
+   *
+   * Note: Requires Nextion Intelligent series display.
+   */
+  void set_component_vid(const char *component, uint8_t vid_id);
+
+  /**
+   * Set the drag availability of a component.
+   * @param component The component name.
+   * @param drag False: Drag not available, True: Drag available.
+   *
+   * Example:
+   * ```cpp
+   * it.set_component_drag("textview", true);
+   * ```
+   *
+   * This will enable drag to the component `textview`.
+   *
+   * Note: Requires Nextion Intelligent series display.
+   */
+  void set_component_drag(const char *component, bool drag);
+
+  /**
+   * Set the opaqueness (fading) of a component.
+   * @param component The component name.
+   * @param aph An integer between 0 and 127 related to the opaqueness/fading level.
+   *
+   * Example:
+   * ```cpp
+   * it.set_component_aph("textview", 64);
+   * ```
+   *
+   * This will set the opaqueness level of the component `textview` to 64.
+   *
+   * Note: Requires Nextion Intelligent series display.
+   */
+  void set_component_aph(const char *component, uint8_t aph);
+
+  /**
+   * Set the position of a component.
+   * @param component The component name.
+   * @param x The new X (horizontal) coordinate for the component.
+   * @param y The new Y (vertical) coordinate for the component.
+   *
+   * Example:
+   * ```cpp
+   * it.set_component_aph("textview", 64, 35);
+   * ```
+   *
+   * This will move the component `textview` to the column 64 of row 35 of the display.
+   *
+   * Note: Requires Nextion Intelligent series display.
+   */
+  void set_component_position(const char *component, uint32_t x, uint32_t y);
 
   // ========== INTERNAL METHODS ==========
   // (In most use cases you won't need these)
@@ -1154,6 +1236,7 @@ class Nextion : public NextionBase, public PollingComponent, public uart::UARTDe
   int16_t start_up_page_ = -1;
   bool auto_wake_on_touch_ = true;
   bool exit_reparse_on_start_ = false;
+  bool skip_connection_handshake_ = false;
 
   /**
    * Manually send a raw command to the display and don't wait for an acknowledgement packet.
